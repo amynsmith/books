@@ -1,5 +1,3 @@
-const SCRIPTS = require('./scripts.js');
-
 // flattening
 let arrays = [[1, 2, 3], [4, 5], [6]];
 console.log(arrays.flat())
@@ -26,7 +24,7 @@ console.log(every([2, 4, 16], n => n < 10));
 console.log(every([], n => n < 10));
 
 // dominant writing direction
-require('./scripts.js');
+const SCRIPTS = require('./scripts.js');
 
 function charDirection(code){
     for (let script of SCRIPTS){
