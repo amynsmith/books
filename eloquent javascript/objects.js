@@ -15,8 +15,8 @@ class Vec{
     }
 }
 
-v1= new Vec(0,1)
-v2= new Vec(3,4)
+let v1= new Vec(0,1)
+let v2= new Vec(3,4)
 console.log(v1.plus(v2))
 console.log(v1.minus(v2))
 console.log(v2.length)
@@ -87,5 +87,37 @@ Group.prototype[Symbol.iterator]=function(){
 for(let v of g){console.log(v);}
 
 // borrowing a method
-map1={"hasOwnProperty":"blahblahblah", "name":"abc", "age":80};
+let map1={"hasOwnProperty":"blahblahblah", "name":"abc", "age":80};
 console.log(Map.prototype.hasOwnProperty.call(map1, "hasOwnProperty"))
+
+// chapter 5
+// Persistent group
+class PGroup{
+    static empty= new PGroup([]);
+    constructor(member){
+        this.member=member;
+    }
+
+    add(v){
+        if(this.has(v)){return new PGroup(this.member)}
+        return new PGroup(this.member.concat([v]))
+    }
+
+    delete(v){
+        if(this.has(v)){return new PGroup(this.member.filter(e=> e!==v));}
+        return new PGroup(this.member);
+    }
+
+    has(v){
+        return this.member.includes(v);
+    }
+}
+
+
+let a = PGroup.empty.add("a");
+let ab = a.add("b");
+let b = ab.delete("a");
+
+console.log(b.has("b")); //true
+console.log(a.has("b")); //false
+console.log(b.has("a")); //false
