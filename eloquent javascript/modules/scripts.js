@@ -1117,7 +1117,9 @@ var SCRIPTS = [
 
 // This makes sure the data is exported in node.js —
 // `require('./path/to/scripts.js')` will get you the array.
-if (typeof module != "undefined" && module.exports && (typeof window == "undefined" || window.exports != exports))
-  module.exports = SCRIPTS;
-if (typeof global != "undefined" && !global.SCRIPTS)
-  global.SCRIPTS = SCRIPTS;
+// if (typeof module != "undefined" && module.exports && (typeof window == "undefined" || window.exports != exports))
+//   module.exports = SCRIPTS;
+// if (typeof global != "undefined" && !global.SCRIPTS)
+//   global.SCRIPTS = SCRIPTS;
+
+export {SCRIPTS};

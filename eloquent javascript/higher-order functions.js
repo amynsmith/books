@@ -24,24 +24,24 @@ console.log(every([2, 4, 16], n => n < 10));
 console.log(every([], n => n < 10));
 
 // dominant writing direction
-const SCRIPTS = require('./scripts.js');
+import {SCRIPTS} from './modules/scripts.js';
 
 function charDirection(code){
     for (let script of SCRIPTS){
-        inrange = script.ranges.some(([from,to])=>{return code>=from && code < to;})
+        let inrange = script.ranges.some(([from,to])=>{return code>=from && code < to;})
         if(inrange){return script.direction;}
     }
     return null;
 }
 
 function dominantDirection(text){  
-    direcdict={};
+    let direcdict={};
     for (let t of text){
-        direc = charDirection(t.codePointAt(0));
+        let direc = charDirection(t.codePointAt(0));
         if(!direcdict[direc]){direcdict[direc]=0;}
         direcdict[direc]++;
     }
-    ind=Object.values(direcdict).indexOf(Math.max(...Object.values(direcdict)));
+    let ind=Object.values(direcdict).indexOf(Math.max(...Object.values(direcdict)));
     return Object.keys(direcdict).at(ind)
 }
 
