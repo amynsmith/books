@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Mountains</h1>
+
+    <div id="mountains"></div>
+
+    <script>
+        const MOUNTAINS = [
+            { name: "Kilimanjaro", height: 5895, place: "Tanzania" },
+            { name: "Everest", height: 8848, place: "Nepal" },
+            { name: "Mount Fuji", height: 3776, place: "Japan" },
+            { name: "Vaalserberg", height: 323, place: "Netherlands" },
+            { name: "Denali", height: 6168, place: "United States" },
+            { name: "Popocatepetl", height: 5465, place: "Mexico" },
+            { name: "Mont Blanc", height: 4808, place: "Italy/France" }
+        ];
+
+        function generateTable(array) {
+            if (array.length < 1) { return null; }
+            let tbl = document.createElement("table");
+            let tr = document.createElement("tr");
+            for (let h of Object.keys(array[0])) {
+                th = document.createElement("th");
+                th.appendChild(document.createTextNode(h));
+                tr.appendChild(th);
+            }
+            tbl.appendChild(tr);
+            for (let row of array) {
+                tr = document.createElement("tr")
+                for (let v of Object.values(row)) {
+                    td = document.createElement("td");
+                    td.appendChild(document.createTextNode(v));
+                    if (typeof v == "number") {
+                        td.style.textAlign = "right";
+                    }
+                    tr.appendChild(td);
+                }
+                tbl.appendChild(tr);
+            }
+            return tbl;
+        }
+
+        let tbl = generateTable(MOUNTAINS);
+        let container = document.getElementById("mountains");
+        container.appendChild(tbl);
+
+    </script>
+</body>
+
+</html>
