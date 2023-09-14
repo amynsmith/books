@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const fn = (e, data) => console.log(data)
+        const dbounceFn = debounce(fn, 2000)
+        // const throttleFn = throttle(fn, 2000)
+        document.onmousemove = function (e) {
+            dbounceFn(e, 'debounce');
+        }
+        // document.onmousemove = function (e) {
+        //     throttleFn(e, 'throttle');
+        // }
+
+        function debounce(fn, delay) {
+            let timer;
+            return function () {
+                const _this = this;
+                const args = arguments;
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(() => {
+                    fn.apply(_this, args); // _this.fn(args);
+                }, delay)
+            }
+        }
+
+        // function throttle(fn, delay) {
+        //     let timer;
+        //     return function () {
+        //         const _this = this;
+        //         const args = arguments;
+        //         if (timer) return;
+        //         timer = setTimeout(() => {
+        //             fn.apply(_this, args); // _this.fn(args);
+        //             timer = null;
+        //         }, delay)
+        //     }
+        // }
+    </script>
+</body>
+
+</html>

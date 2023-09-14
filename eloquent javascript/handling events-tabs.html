@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <tab-panel>
+        <div data-tabname="one">Tab one</div>
+        <div data-tabname="two">Tab two</div>
+        <div data-tabname="three">Tab three</div>
+    </tab-panel>
+    <style>
+        .activetab {
+            background: yellow;
+        }
+    </style>
+
+    <!-- <script>
+        function asTabs(node) {
+            let num = node.children.length;
+            let firstdiv = node.children[0];
+            let tabnames = []
+            for (let i = 0; i < num; i++) {
+                node.children[i].style.display = "none"
+                tabnames.push(node.children[i].getAttribute("data-tabname"))
+            }
+            for (let i = 0; i < num; i++) {
+                let btn = document.createElement("button")
+                btn.textContent = tabnames[i]
+                node.insertBefore(btn, firstdiv)
+            }
+
+            document.body.addEventListener("click", showtext);
+            function showtext(event) {
+                if (event.target.nodeName == "BUTTON") {
+                    tabname = event.target.textContent
+                    alldivs = document.querySelectorAll("div[data-tabname]")
+                    alldivs.forEach(div => { div.style.display = "none" })
+                    visiblediv = document.querySelector("div[data-tabname=" + tabname + "]")
+                    visiblediv.style.display = "block"
+                    document.querySelectorAll("button").forEach(btn => btn.setAttribute("class", ""))
+                    event.target.setAttribute("class", "activetab")
+                }
+            }
+        }
+        asTabs(document.querySelector("tab-panel"));
+    </script> -->
+
+    <!-- given solution -->
+    <script>
+        function asTabs(node) {
+            let tabs = Array.from(node.children).map(node => {
+                let button = document.createElement("button");
+                button.textContent = node.getAttribute("data-tabname");
+                let tab = { node, button };
+                button.addEventListener("click", () => selectTab(tab));
+                return tab;
+            });
+
+            let tabList = document.createElement("div");
+            for (let { button } of tabs) tabList.appendChild(button);
+            node.insertBefore(tabList, node.firstChild);
+
+            function selectTab(selectedTab) {
+                for (let tab of tabs) {
+                    let selected = tab == selectedTab;
+                    tab.node.style.display = selected ? "" : "none";
+                    tab.button.style.color = selected ? "red" : "";
+                }
+            }
+            selectTab(tabs[0]);
+        }
+
+        asTabs(document.querySelector("tab-panel"));
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <style>
+        .trail {
+            /* className for the trail elements */
+            position: absolute;
+            height: 6px;
+            width: 6px;
+            border-radius: 3px;
+            background: teal;
+        }
+
+        body {
+            height: 300px;
+        }
+    </style>
+
+    <script>
+        let count = 10;
+        for (let i = 0; i < count; i++) {
+            let dot = document.createElement("span")
+            dot.setAttribute("class", "trail")
+            dot.style.left = 0;
+            dot.style.top = 0;
+            document.body.appendChild(dot)
+        }
+
+        let dots = document.querySelectorAll(".trail");
+        let posX, posY;
+        document.body.addEventListener("mousemove", move);
+        function move(event) {
+            posX = event.clientX;
+            posY = event.clientY;
+            window.requestAnimationFrame(trail);
+        }
+        let counter=0;
+        function trail(timestamp) {
+            dot = dots[counter]
+            dot.style.left = posX + "px"
+            dot.style.top = posY + "px"
+            counter=(counter+1)%count;
+        } 
+
+    </script>
+</body>
+
+</html>
