@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="content-security-policy"
+        content="default-src https: 'unsafe-eval' 'unsafe-inline' 'self' blob: file:; object-src 'none'; " />
+    <title>Document</title>
+    <style>
+        .monster {
+            background: purple
+        }
+    </style>
+</head>
+
+<script type="importmap">
+    {
+        "imports":{
+            "game": "./modules/game.js",
+            "levels": "./modules/levels.js"
+        }
+    }
+</script>
+
+
+<link rel="stylesheet" href="css/game.css">
+
+<body>
+    <script type="module">
+        import { GAME_LEVELS } from "levels";
+        // import { DOMDisplay, runLevel, Level } from "game";
+        import { DOMDisplay, Level, State, runAnimation, arrowKeys, Vec, levelChars } from "game";
+
+        function runLevel(level, Display) {
+            let display = new Display(document.body, level);
+            let state = State.start(level);
+            let ending = 1;
+            let pause = false;
+            let promise = new Promise((resolve) => {
+                function framefunc(time) {
+                    state = state.update(time, arrowKeys);
+                    display.syncState(state);
+                    if (pause) {
+                        arrowKeys.unregister();
+                        return false;
+                    } else if (state.status == "playing") {
+                        return true;
+                    } else if (ending > 0) {
+                        ending -= time;
+                        return true;
+                    } else {
+                        display.clear();
+                        resolve(state.status);
+                        window.removeEventListener("keydown", escfunc)
+                        arrowKeys.unregister();
+                        return false;
+                    }
+                };
+                function escfunc(event) {
+                    if (event.key == "Escape") {
+                        pause = !pause;
+                        event.preventDefault();
+                        console.log(`pause: ${pause}`)
+                        if (!pause) {
+                            arrowKeys.register()
+                            runAnimation(framefunc)
+                        }
+                    }
+                }
+                window.addEventListener("keydown", escfunc);
+                arrowKeys.register();
+                runAnimation(framefunc);
+            }
+            );
+            return promise;
+        }
+
+
+        // // given solution
+        // function runLevel(level, Display) {
+        //     let display = new Display(document.body, level);
+        //     let state = State.start(level);
+        //     let ending = 1;
+        //     let running = "yes";
+
+        //     return new Promise(resolve => {
+        //         function escHandler(event) {
+        //             if (event.key != "Escape") return;
+        //             event.preventDefault();
+        //             if (running == "no") {
+        //                 running = "yes";
+        //                 runAnimation(frame);
+        //             } else if (running == "yes") {
+        //                 running = "pausing";
+        //             } else {
+        //                 running = "yes";
+        //             }
+        //         }
+        //         window.addEventListener("keydown", escHandler);
+        //         let arrowKeys = trackKeys(["ArrowLeft", "ArrowRight", "ArrowUp"]);
+
+        //         function frame(time) {
+        //             if (running == "pausing") {
+        //                 running = "no";
+        //                 return false;
+        //             }
+
+        //             state = state.update(time, arrowKeys);
+        //             display.syncState(state);
+        //             if (state.status == "playing") {
+        //                 return true;
+        //             } else if (ending > 0) {
+        //                 ending -= time;
+        //                 return true;
+        //             } else {
+        //                 display.clear();
+        //                 window.removeEventListener("keydown", escHandler);
+        //                 arrowKeys.unregister();
+        //                 resolve(state.status);
+        //                 return false;
+        //             }
+        //         }
+        //         runAnimation(frame);
+        //     });
+        // }
+
+        // function trackKeys(keys) {
+        //     let down = Object.create(null);
+        //     function track(event) {
+        //         if (keys.includes(event.key)) {
+        //             down[event.key] = event.type == "keydown";
+        //             event.preventDefault();
+        //         }
+        //     }
+        //     window.addEventListener("keydown", track);
+        //     window.addEventListener("keyup", track);
+        //     down.unregister = () => {
+        //         window.removeEventListener("keydown", track);
+        //         window.removeEventListener("keyup", track);
+        //     };
+        //     return down;
+        // }
+
+        // given solution
+        async function runGame(plans, Display) {
+            let lives = 3;
+            for (let level = 0; level < plans.length && lives > 0;) {
+                console.log(`Level ${level + 1}, lives: ${lives}`);
+                let status = await runLevel(new Level(plans[level]), Display);
+                if (status == "won") level++;
+                else lives--;
+            }
+            if (lives > 0) {
+                console.log("You've won!");
+            } else {
+                console.log("Game over");
+            }
+        }
+
+        // runGame(GAME_LEVELS, DOMDisplay);
+
+        /////////////////////////////////////////////////////////////////////////////////
+        // monsters
+
+        // Complete the constructor, update, and collide methods
+        class Monster {
+            constructor(pos, speed) {
+                this.pos = pos;
+                this.speed = speed;
+            }
+
+            get type() { return "monster"; }
+
+            static create(pos) {
+                let speed = 2
+                return new Monster(pos.plus(new Vec(0, -1)), speed);
+            }
+
+            update(time, state) {
+                let player = state.player;
+                let speed = this.speed;
+                if(player.pos.x - this.pos.x <= 0){
+                    speed=-1*Math.abs(speed);
+                }
+                let loc = this.pos.plus(new Vec(time * speed, 0));
+                if (!state.level.touches(loc, this.size, "wall")) {
+                    return new Monster(loc, speed)
+                }else{
+                    return new Monster(this.pos, -1*this.speed)
+                }
+            }
+
+            collide(state) {
+                let player = state.player, status = state.status;
+                let filtered = state.actors.filter(a => a != this);
+                console.log(`player posY: ${player.pos.y} sizeY: ${player.size.x}`)
+                console.log(`monster posY: ${this.pos.y} sizeY: ${this.size.y}`)
+                if (Math.floor(player.pos.y-player.size.y) >= this.pos.y -this.size.y) status = "lost"
+                // given solution
+                // if(player.pos.y + player.size.y >= this.pos.y + 0.5) status = "lost"
+                return new State(state.level, filtered, status);
+            }
+        }
+
+        Monster.prototype.size = new Vec(1.2, 2);
+
+        levelChars["M"] = Monster;
+
+        runLevel(new Level(`
+..................................
+.################################.
+.#..............................#.
+.#..............................#.
+.#..............................#.
+.#...........................o..#.
+.#..@...........................#.
+.##########..............########.
+..........#..o..o..o..o..#........
+..........#...........M..#........
+..........################........
+..................................
+`), DOMDisplay);
+
+    </script>
+</body>
+
+</html>
