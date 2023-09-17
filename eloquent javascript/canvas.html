@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas width="1000" height="1000"></canvas>
+    <script type="module" src="./modules/canvas.js"></script>
+    <script type="module" src="./modules/game.js"></script>
+    <script>
+        function trapezoid(cx, x, y, width1, width2, height) {
+            cx.beginPath();
+            cx.moveTo(x, y);
+            let deltax = (width2 - width1) / 2;
+            cx.lineTo(x + deltax, y - height);
+            cx.lineTo(x + width2 - deltax, y - height);
+            cx.lineTo(x + width2, y);
+            cx.closePath();
+            cx.stroke();
+        }
+
+        function diamond(cx, x, y, width) {
+            cx.translate(x, y)
+            cx.fillStyle = "red"
+            cx.rotate(Math.PI / 4)
+            cx.translate(-x - width / 2, -y - width / 2)
+            cx.fillRect(x, y, width, width)
+            cx.resetTransform()
+        }
+
+        function zigzagline(cx, x, y, width, height, nline) {
+            cx.beginPath();
+            cx.moveTo(x, y)
+            for (let n = 0; n < nline; n++) {
+                y = y + height
+                if (n % 2 == 0) {
+                    cx.lineTo(x + width, y)
+                } else {
+                    cx.lineTo(x, y)
+                }
+            }
+            cx.stroke()
+        }
+
+        function spiral(x, y, nline) {
+            cx.beginPath();
+            cx.moveTo(x, y)
+            for (let n = 0; n < nline; n++) {
+                //let rad=n%(2*Math.PI)
+                let rad = n % 360 / (2 * Math.PI)
+                cx.lineTo(x + n * Math.cos(rad), y + n * Math.sin(rad))
+            }
+            cx.stroke()
+        }
+
+        function star(x, y, narc, r) {
+            let rad = Math.PI * 2 / narc;
+            let len = r / Math.tan(rad / 2)
+            cx.beginPath();
+            cx.moveTo(x, y - len);
+            for (let n = 1; n < narc + 1; n++) {
+                let nextX = x + len * Math.sin(n * rad)
+                let nextY = y - len * Math.cos(n * rad)
+                cx.quadraticCurveTo(x, y, nextX, nextY)
+            }
+            //cx.stroke()
+            cx.fillStyle = "orange"
+            cx.fill()
+        }
+
+        let cx = document.querySelector("canvas").getContext("2d");
+        let x = 50, y = 100;
+        let width1 = 50, width2 = 100, height = 50;
+        trapezoid(cx, x, y, width1, width2, height);
+
+        let width = 50;
+        x = 100, y = 200;
+        diamond(cx, x, y, width);
+        cx.fillStyle = "black";
+        cx.fillRect(x - 0.5, y - 0.5, 1, 1);
+
+        let nline = 20;
+        x = 200, y = 20;
+        width = 100, height = 20;
+        zigzagline(cx, x, y, width, height, nline);
+
+        x = 500, y = 100;
+        nline = 100;
+        spiral(x, y, nline);
+
+        x = 700, y = 100;
+        let narc = 8;
+        let r = 30;
+        star(x, y, narc, r);
+
+        // given solution
+        // function diamond(x, y) {
+        //     cx.translate(x + 30, y + 30);
+        //     cx.rotate(Math.PI / 4);
+        //     cx.fillStyle = "red";
+        //     cx.fillRect(-30, -30, 60, 60);
+        //     cx.resetTransform();
+        // }
+        // diamond(140, 30);
+    </script>
+
+    <script type="module">
+        import { results } from "./modules/canvas.js";
+
+        let cx = document.querySelector("canvas").getContext("2d");
+        let total = results
+            .reduce((sum, { count }) => sum + count, 0);
+        let currentAngle = -0.5 * Math.PI;
+        let centerX = 500, centerY = 500;
+
+        for (let result of results) {
+            let sliceAngle = (result.count / total) * 2 * Math.PI;
+            cx.beginPath();
+            cx.arc(centerX, centerY, 100,
+                currentAngle, currentAngle + sliceAngle);
+
+            let tmpAngle = currentAngle + sliceAngle / 2
+            cx.lineTo(centerX, centerY);
+            cx.fillStyle = result.color;
+            cx.strokeStyle = result.color;
+            cx.fill();
+            cx.font = "18px Arial"
+            cx.fillStyle = "black";
+
+            if (tmpAngle <= Math.PI / 2 && tmpAngle >= -Math.PI / 2) {
+                cx.fillText(result.name, centerX + 50 * Math.cos(tmpAngle), centerY + 50 * Math.sin(tmpAngle))
+            } else {
+                cx.textAlign = "center";
+                cx.fillText(result.name, centerX + 100 * Math.cos(tmpAngle), centerY + 100 * Math.sin(tmpAngle), 100)
+            }
+            currentAngle += sliceAngle;
+        }
+    </script>
+
+    <!-- // given solution -->
+    <!-- <script>
+        let cx = document.querySelector("canvas").getContext("2d");
+        let total = results.reduce(function (sum, choice) {
+            return sum + choice.count;
+        }, 0);
+
+        let currentAngle = -0.5 * Math.PI;
+        let centerX = 300, centerY = 150;
+
+        results.forEach(function (result) {
+            let sliceAngle = (result.count / total) * 2 * Math.PI;
+            cx.beginPath();
+            cx.arc(centerX, centerY, 100,
+                currentAngle, currentAngle + sliceAngle);
+
+            let middleAngle = currentAngle + 0.5 * sliceAngle;
+            let textX = Math.cos(middleAngle) * 120 + centerX;
+            let textY = Math.sin(middleAngle) * 120 + centerY;
+            cx.textBaseLine = "middle";
+            if (Math.cos(middleAngle) > 0) {
+                cx.textAlign = "left";
+            } else {
+                cx.textAlign = "right";
+            }
+            cx.font = "15px sans-serif";
+            cx.fillStyle = "black";
+            cx.fillText(result.name, textX, textY);
+
+            currentAngle += sliceAngle;
+            cx.lineTo(centerX, centerY);
+            cx.fillStyle = result.color;
+            cx.fill();
+        });
+    </script> -->
+
+
+    <script type="module">
+        import { Vec } from "./modules/game.js"
+
+        let cx = document.querySelector("canvas").getContext("2d");
+        x = 600, y = 600, width = 300, height = 100
+        cx.moveTo(x, y)
+        cx.lineWidth = 4;
+        cx.strokeRect(x, y, width, height)
+        let pos = new Vec(620, 680)
+        r = 20
+        let speed = new Vec(100, 20)
+        cx.moveTo(pos.x, pos.y)
+        cx.arc(pos.x, pos.y, r, 0, 7)
+        cx.stroke()
+
+        let lastTime = null;
+        function frame(time) {
+            if (lastTime != null) {
+                updateAnimation(Math.min(100, time - lastTime) / 1000);
+            }
+            lastTime = time;
+            requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+
+        function updateAnimation(step) {
+            pos = pos.plus(speed.times(step))
+            if (pos.x > x + width - r || pos.x < x + r) {
+                speed.x = -speed.x
+            }
+            if (pos.y > y + height - r || pos.y < y + r) {
+                speed.y = -speed.y
+            }
+
+            cx.clearRect(x, y, width, height)
+            cx.lineWidth = 4;
+            cx.strokeRect(x, y, width, height)
+            cx.beginPath()  // don't omit
+            cx.arc(pos.x, pos.y, r, 0, 7)
+            cx.closePath()
+            cx.stroke()
+        }
+    </script>
+
+</body>
+
+</html>
