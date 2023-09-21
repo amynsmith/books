@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+<label for="code">Javascript Workbench<br></label>
+<textarea id="code" name="code" cols="50" rows="5">return "hi";</textarea>
+<button type="button" id="button">Run</button>
+<pre id="output"></pre>
+
+<script>
+  let btn = document.querySelector("#button")
+  let textarea = document.querySelector("#code")
+  let output = document.querySelector("#output")
+  btn.addEventListener("click", ()=>{
+  	text=textarea.value;
+    try{
+    	value = Function(text)()
+    }catch(e){ value = e }
+    output.textContent=String(value)
+  })
+</script>
+
+  <!-- given solution -->
+  <!-- <script>
+    const url = "https://eloquentjavascript.net/author";
+    const types = ["text/plain",
+      "text/html",
+      "application/json",
+      "application/rainbows+unicorns"];
+
+    async function showTypes() {
+      for (let type of types) {
+        let resp = await fetch(url, { headers: { accept: type } });
+        console.log(`${type}: ${await resp.text()}\n`);
+      }
+    }
+
+    showTypes();
+  </script> -->
+</body>
+
+</html>
