@@ -1,0 +1,48 @@
+*{
+    font-size: 16px;
+}
+
+form{
+    display: grid;
+    margin: 2rem 2rem auto 2rem;
+    grid-template-columns: 1fr 3fr 1fr;
+    gap: 5px;
+    grid-auto-rows: minmax(3rem, auto);
+    grid-template-areas:
+        "label1 select select"
+        "label2 title title"
+        "label3 . ."
+        "textarea textarea textarea"
+        ". . button";
+}
+label{
+    align-self: center;
+}
+
+label[for="filelist"]{
+    grid-area: label1;
+}
+label[for="title"]{
+    grid-area: label2;
+}
+label[for="content"]{
+    grid-area: label3;
+}
+
+select{
+    grid-area: select;
+}
+input{
+    grid-area: title;
+}
+textarea{
+    grid-area: textarea;
+    resize: vertical;
+    height: 20rem;
+    min-height: 10rem;
+    max-height: 50vh;
+}
+
+button{
+    grid-area: button;
+}
