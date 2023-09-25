@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script src="./draw_layout.js"></script>
+    <script src="./fast.js"></script>
+    <script>
+        // runLayout(forceDirected_simple, treeGraph(4, 4));
+    </script>
+    <script>
+        // function findPath(a, b) {
+        //     let work = [{ from: a, route: [a] }];
+        //     for (let i = 0; i < work.length; i++) {
+        //         let { from, route } = work[i];
+        //         if (from.hasEdge(b)) return route.concat(b);
+        //         for (let edge of from.edges) {
+        //             work.push({ from: edge, route: route.concat(from) })
+        //         }
+        //     }
+        // }
+
+
+        // given solution
+        function time(findPath) {
+            let graph = treeGraph(6, 6);
+            let startTime = Date.now();
+            let result = findPath(graph[0], graph[graph.length - 1]);
+            console.log(`Path with length ${result.length} found in ${Date.now() - startTime}ms`);
+        }
+
+        function findPath_set(a, b) {
+            let work = [[a]];
+            let reached = new Set([a]);
+            for (let path of work) {
+                let end = path[path.length - 1];
+                if (end == b) return path;
+                for (let next of end.edges) {
+                    if (!reached.has(next)) {
+                        reached.add(next);
+                        work.push(path.concat([next]));
+                    }
+                }
+            }
+        }
+
+        time(findPath_set);
+
+        function pathToArray(path) {
+            let result = [];
+            for (; path; path = path.via) result.unshift(path.at);
+            return result;
+        }
+
+        function findPath_list(a, b) {
+            let work = [{ at: a, via: null }];
+            let reached = new Set([a]);
+            for (let path of work) {
+                if (path.at == b) return pathToArray(path);
+                for (let next of path.at.edges) {
+                    if (!reached.has(next)) {
+                        reached.add(next);
+                        work.push({ at: next, via: path });
+                    }
+                }
+            }
+        }
+
+        time(findPath_list);
+
+
+        // let graph = treeGraph(4, 4);
+        // let root = graph[0], leaf = graph[graph.length - 1];
+        // console.log(findPath(root, leaf).length);
+        // // → 4
+
+        // leaf.connect(root);
+        // console.log(findPath(root, leaf).length);
+        // // → 2
+
+    </script>
+</body>
+
+</html>
